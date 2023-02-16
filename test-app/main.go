@@ -11,31 +11,31 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-// @Summary		Hello
-// @Router			/ [get]
-// @x-perf-check	{ "latency": 100, "errorRate": 0.1 }
+//	@Summary		Hello
+//	@Router			/ [get]
+//	@x-perf-check	{ "latency": 100, "errorRate": 0.1 }
 func Helloworld(g *gin.Context) {
 	g.JSON(http.StatusOK, "helloworld")
 }
 
-// @Summary		TestRoute
-// @Router			/test-route [get]
-// @x-perf-check	{ "latency": 250, "errorRate": 0.2 }
+//	@Summary		TestRoute
+//	@Router			/test-route [get]
+//	@x-perf-check	{ "latency": 250, "errorRate": 0.2 }
 func TestRoute(g *gin.Context) {
 	time.Sleep(1000000000)
 	g.JSON(http.StatusOK, "test-route")
 }
 
-// @Summary		TestRoute
-// @Router			/group/a [get]
-// @x-perf-check	{ "latency": 150, "errorRate": 0.05 }
+//	@Summary		TestRoute
+//	@Router			/group/a [get]
+//	@x-perf-check	{ "latency": 150, "errorRate": 0.05 }
 func GroupA(g *gin.Context) {
 	g.JSON(http.StatusOK, "group/a")
 }
 
-// @Summary		TestRoute
-// @Router			/group/b [get]
-// @x-perf-check	{ "latency": 150, "errorRate": 0.1 }
+//	@Summary		TestRoute
+//	@Router			/group/b [get]
+//	@x-perf-check	{ "latency": 150, "errorRate": 0.1 }
 func GroupB(g *gin.Context) {
 	g.JSON(http.StatusOK, "group/b")
 }
