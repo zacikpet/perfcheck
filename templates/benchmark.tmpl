@@ -1,0 +1,19 @@
+import http from 'k6/http';
+import { group } from 'k6';
+
+export const options = {
+  thresholds: {
+    {{- range .Paths }}
+      'http_req_duration{group:::{{ .Pathname }}}': ['p(95) < {{ .Latency }}'],   
+      'http_req_failed{group:::{{ .Pathname }}}': ['rate < {{ .ErrorRate }}'],
+    {{- end }}
+  }
+}
+
+export default function () {
+  {{- range .Paths }}
+    group("{{ .Pathname }}", function () {
+        const res = http.get('{{ $.BaseUrl }}{{ .Pathname }}');
+    });
+  {{- end }}
+}
