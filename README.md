@@ -1,10 +1,12 @@
 # perf-check
-Performance testing automation tool
 
+This repositor contains:
+- `perf-check`: a tool that generates benchmarks from a swagger documentation
+- a testing REST app that serves swagger documentation
 
 ## How to run
 
-### 1. Generate docs for `test-app`
+### 1. Generate docs for `test-app` (optional)
 
 Inside the `test-app` subdirectory, run:
 
