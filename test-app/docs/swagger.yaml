@@ -9,14 +9,14 @@ paths:
         errorRate: 0.1
         latency: 100
   /group/a:
-    get:
+    post:
       responses: {}
       summary: TestRoute
       x-perf-check:
         errorRate: 0.05
         latency: 150
   /group/b:
-    get:
+    patch:
       responses: {}
       summary: TestRoute
       x-perf-check:

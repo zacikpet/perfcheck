@@ -1,24 +1,31 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"text/template"
 
 	"github.com/joho/godotenv"
 	"github.com/pb33f/libopenapi"
 )
 
-type path struct {
-	Pathname  string
+type SLO struct {
 	Latency   int
 	ErrorRate float64
 }
 
+type request struct {
+	Method   string
+	Pathname string
+	SLO      SLO
+}
+
 type model struct {
-	Paths []path
+	requests []request
 }
 
 func check(errs ...error) {
@@ -32,9 +39,37 @@ func check(errs ...error) {
 	}
 }
 
+func validateMetadata(metadata any) (*SLO, []error) {
+	slo, ok := metadata.(map[string]any)
+
+	var errs []error
+
+	if !ok {
+		errs = append(errs, errors.New("invalid type of x-perf-check"))
+	}
+
+	latency := slo["latency"]
+	errorRate := slo["errorRate"]
+
+	_latency, ok := latency.(int)
+
+	if !ok {
+		errs = append(errs, errors.New("latency must be a number"))
+	}
+
+	_errorRate, ok := errorRate.(float64)
+
+	if !ok {
+		errs = append(errs, errors.New("error rate must be a float64"))
+	}
+
+	return &SLO{Latency: _latency, ErrorRate: _errorRate}, errs
+}
+
 func buildModel(document libopenapi.Document) model {
 	version := document.GetVersion()
 
+	var methods []string
 	var pathnames []string
 	var slos []any
 
@@ -43,9 +78,13 @@ func buildModel(document libopenapi.Document) model {
 		check(errs...)
 
 		for pathname := range model.Model.Paths.PathItems {
-			slo := model.Model.Paths.PathItems[pathname].Get.Extensions["x-perf-check"]
-			slos = append(slos, slo)
-			pathnames = append(pathnames, pathname)
+			ops := model.Model.Paths.PathItems[pathname].GetOperations()
+
+			for method, op := range ops {
+				slos = append(slos, op.Extensions["x-perf-check"])
+				pathnames = append(pathnames, pathname)
+				methods = append(methods, method)
+			}
 		}
 
 	} else if version[0] == '3' {
@@ -53,48 +92,37 @@ func buildModel(document libopenapi.Document) model {
 		check(errs...)
 
 		for pathname := range model.Model.Paths.PathItems {
-			slo := model.Model.Paths.PathItems[pathname].Get.Extensions["x-perf-check"]
-			slos = append(slos, slo)
-			pathnames = append(pathnames, pathname)
+			ops := model.Model.Paths.PathItems[pathname].GetOperations()
+
+			for method, op := range ops {
+				slos = append(slos, op.Extensions["x-perf-check"])
+				pathnames = append(pathnames, pathname)
+				methods = append(methods, method)
+			}
 		}
 
 	} else {
 		panic(fmt.Sprintf("Unsupported document version (required 2 or 3, found %s)", version))
 	}
 
-	var paths []path
+	var paths []request
 
 	for i, slo := range slos {
 		if slo == nil {
 			continue
 		}
 
-		_slo, ok := slo.(map[string]any)
+		_slo, errs := validateMetadata(slo)
+		check(errs...)
 
-		if !ok {
-			panic("x-perf-check has invalid type")
-		}
-
-		latency := _slo["latency"]
-		errorRate := _slo["errorRate"]
-
-		l, ok := latency.(int)
-
-		if !ok {
-			panic("latency must be a number")
-		}
-
-		e, ok := errorRate.(float64)
-
-		if !ok {
-			panic("error rate must be a float64")
-		}
-
-		paths = append(paths, path{Pathname: pathnames[i], Latency: l, ErrorRate: e})
+		paths = append(paths, request{
+			Pathname: pathnames[i],
+			Method:   methods[i],
+			SLO:      *_slo,
+		})
 	}
 
-	return model{Paths: paths}
-
+	return model{requests: paths}
 }
 
 func main() {
@@ -113,7 +141,7 @@ func main() {
 
 	model := buildModel(document)
 
-	tmpl, err := template.ParseFiles("templates/benchmark.tmpl")
+	tmpl, err := template.ParseFiles("templates/benchmark.js.tmpl")
 	check(err)
 
 	err = os.MkdirAll("benchmarks", os.ModePerm)
@@ -126,9 +154,26 @@ func main() {
 	vars := make(map[string]interface{})
 
 	vars["BaseUrl"] = os.Getenv("BASE_URL")
-	vars["Paths"] = model.Paths
+	vars["Paths"] = model.requests
 
 	tmpl.Execute(file, vars)
 
 	fmt.Println("Benchmark generated.")
+
+	_, err = exec.LookPath("k6")
+	check(err)
+
+	cmd := exec.Command("k6", "run", file.Name())
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+
+	err = cmd.Run()
+
+	if err != nil {
+		fmt.Println("✋")
+	} else {
+		fmt.Println("👌")
+	}
+
 }

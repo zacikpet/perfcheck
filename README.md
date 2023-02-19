@@ -34,16 +34,10 @@ Create a `.env` file with the following contents:
 
 This will tell `perf-check` the location and description of the service.
 
-### 4. Generate benchmark file
+### 4. Generate and run benchmark file
 
 Inside the root directory, run:
 
     go run gen.go
 
-to generate a `benchmarks/benchmark.js` file.
-
-### 5. Run benchmark file
-
-Use [k6](https://k6.io/) to run the benchmark file:
-
-    k6 run benchmarks/benchmark.js
+to generate a `benchmarks/benchmark.js` file. The file is automatically ran using the `k6` binary in your path. If you do not have `k6` installed, this operation will fail.

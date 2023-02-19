@@ -4,8 +4,8 @@ import { group } from 'k6';
 export const options = {
   thresholds: {
     {{- range .Paths }}
-      'http_req_duration{group:::{{ .Pathname }}}': ['p(95) < {{ .Latency }}'],   
-      'http_req_failed{group:::{{ .Pathname }}}': ['rate < {{ .ErrorRate }}'],
+      'http_req_duration{group:::{{ .Pathname }}}': ['p(95) < {{ .SLO.Latency }}'],   
+      'http_req_failed{group:::{{ .Pathname }}}': ['rate < {{ .SLO.ErrorRate }}'],
     {{- end }}
   }
 }
@@ -13,7 +13,7 @@ export const options = {
 export default function () {
   {{- range .Paths }}
     group("{{ .Pathname }}", function () {
-        const res = http.get('{{ $.BaseUrl }}{{ .Pathname }}');
+        const res = http.{{ .Method }}('{{ $.BaseUrl }}{{ .Pathname }}');
     });
   {{- end }}
 }

@@ -26,7 +26,7 @@ const docTemplate = `{
             }
         },
         "/group/a": {
-            "get": {
+            "post": {
                 "summary": "TestRoute",
                 "responses": {},
                 "x-perf-check": {
@@ -36,7 +36,7 @@ const docTemplate = `{
             }
         },
         "/group/b": {
-            "get": {
+            "patch": {
                 "summary": "TestRoute",
                 "responses": {},
                 "x-perf-check": {
