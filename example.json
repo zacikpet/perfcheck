@@ -1,0 +1,29 @@
+{
+    "latency": 100,
+    "errorRate": 0.1,
+    "params": {
+        "path": {
+            "foo": {
+                "example": "test"
+            },
+            "bar": {
+                "range": {
+                    "min": 0,
+                    "max": 50,
+                    "step": 1
+                }
+            },
+            "xyz": {
+                "gen": "bool"
+            }
+        },
+        "query": {
+            "baz": {
+                "gen": "uuid"
+            },
+            "qux": {
+                "gen": "string(16)"
+            }
+        }
+    }
+}
