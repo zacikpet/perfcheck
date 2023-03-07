@@ -1,5 +1,6 @@
 info:
   contact: {}
+  title: Example API
 paths:
   /:
     get:
@@ -8,25 +9,75 @@ paths:
       x-perf-check:
         errorRate: 0.1
         latency: 100
-  /group/a:
-    post:
+  /param/{x}:
+    get:
+      parameters:
+      - description: X param
+        in: path
+        name: x
+        required: true
+        type: integer
       responses: {}
-      summary: TestRoute
-      x-perf-check:
-        errorRate: 0.05
-        latency: 150
-  /group/b:
-    patch:
-      responses: {}
-      summary: TestRoute
+      summary: Example param
       x-perf-check:
         errorRate: 0.1
-        latency: 150
-  /test-route:
+        latency: 100
+        params:
+          path:
+            x:
+              examples:
+              - abc
+              - def
+  /pattern/{x}/{y}:
+    get:
+      parameters:
+      - description: X param
+        in: path
+        name: x
+        required: true
+        type: integer
+      responses: {}
+      summary: Pattern param
+      x-perf-check:
+        errorRate: 0.1
+        latency: 100
+        params:
+          path:
+            x:
+              pattern: uuid
+            "y":
+              pattern: string(8)
+  /range/{x}:
+    get:
+      parameters:
+      - description: X param
+        in: path
+        name: x
+        required: true
+        type: integer
+      responses: {}
+      summary: Range param
+      x-perf-check:
+        errorRate: 0.1
+        latency: 100
+        params:
+          path:
+            x:
+              range:
+                max: 1000
+                min: 0
+  /sleep:
     get:
       responses: {}
-      summary: TestRoute
+      summary: Sleep for n seconds
       x-perf-check:
         errorRate: 0.2
         latency: 250
+        params:
+          query:
+            seconds:
+              examples:
+              - 1
+schemes:
+- http
 swagger: "2.0"
