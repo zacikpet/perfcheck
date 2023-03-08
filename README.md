@@ -29,7 +29,6 @@ to launch a testing HTTP server. The docs will be served at:
 
 Create a `.env` file with the following contents:
 
-    BASE_URL=http://localhost:8080
     DOCS_URL=http://localhost:8080/swagger/doc.json
 
 This will tell `perf-check` the location and description of the service.
@@ -38,6 +37,6 @@ This will tell `perf-check` the location and description of the service.
 
 Inside the root directory, run:
 
-    go run gen.go
+    go run *.go
 
 to generate a `benchmarks/benchmark.js` file. The file is automatically ran using the `k6` binary in your path. If you do not have `k6` installed, this operation will fail.
