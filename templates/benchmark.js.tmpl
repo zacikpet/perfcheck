@@ -19,82 +19,86 @@ export const options = {
 }
 
 const pickRandom = (array) => {
-    return array[Math.floor(Math.random() * array.length)]
+  return array[Math.floor(Math.random() * array.length)]
 }
 
 const randomBool = () => {
-    return Math.random() < 0.5;
+  return Math.random() < 0.5;
 }
 
 const applyPathParams = (path, params) => {
-    return path
-      .split('/')
-      .map(s => s.startsWith('{') && s.endsWith('}')
-        ? params[s.substr(1, s.length - 2)] 
-        : s)
-      .join('/');
+  return path
+    .split('/')
+    .map(s => s.startsWith('{') && s.endsWith('}')
+      ? params[s.substr(1, s.length - 2)]
+      : s)
+    .join('/');
 }
 
 const generateFromRange = (min, max, step = 1) => {
-    return Math.round(Math.random() * (max - min) + min);
+  return Math.round(Math.random() * (max - min) + min);
 }
 
 const generateFromPattern = (pattern) => {
-    const stringPattern = /string\((\d+)\)/
+  const stringPattern = /string\((\d+)\)/
 
-    if (pattern === 'uuid') {
-        return uuidv4();
-    } else if (stringPattern.test(pattern)) {
-        const length = parseInt(pattern.match(stringPattern)[1]);
+  if (pattern === 'uuid') {
+    return uuidv4();
+  } else if (stringPattern.test(pattern)) {
+    const length = parseInt(pattern.match(stringPattern)[1]);
 
-        return randomString(length);
-    } else if (pattern === 'bool') {
-      return randomBool();
-    }
+    return randomString(length);
+  } else if (pattern === 'bool') {
+    return randomBool();
+  }
 }
+
+{{ define "params" }}
+  {{- range $name, $value := . }}
+    {{- if $value.Examples }}
+      {{ $name }}: pickRandom([
+        {{- range $value.Examples -}}
+          '{{- . -}}',
+        {{- end -}}
+      ])
+    {{- else if $value.Range }}
+      {{ $name }}: generateFromRange({{ $value.Range.Min }}, {{ $value.Range.Max }}),
+    {{- else if $value.Pattern }}
+      {{ $name }}: generateFromPattern('{{ $value.Pattern }}'),
+    {{- end }}
+  {{- end }}
+{{- end }}
 
 export default function () {
   {{- range .Paths }}
-    group("{{ .Pathname }}", function () {
-        const pathParams = {
-          {{- range $name, $value := .SLO.Params.Path }}
-            {{- if $value.Examples }}
-              {{ $name }}: pickRandom([
-                {{- range $value.Examples -}}
-                  '{{- . -}}',
-                {{- end -}}
-              ])
-            {{- else if $value.Range }}
-              {{ $name }}: generateFromRange({{ $value.Range.Min }}, {{ $value.Range.Max }}),
-            {{- else if $value.Pattern }}
-              {{ $name }}: generateFromPattern('{{ $value.Pattern }}'),
-            {{- end }}
-          {{- end }}
-        }
+  group("{{ .Pathname }}", function () {
+    const pathParams = {
+      {{- template "params" .SLO.Params.Path }}
+    }
 
-        const queryParams = {
-          {{- range $name, $value := .SLO.Params.Query }}
-            {{- if $value.Examples }}
-              {{ $name }}: pickRandom([
-                {{- range $value.Examples -}}
-                  '{{- . -}}',
-                {{- end -}}
-              ])
-            {{- else if $value.Range }}
-              {{ $name }}: generateFromRange({{ $value.Range.Min }}, {{ $value.Range.Max }}),
-            {{- else if $value.Pattern }}
-              {{ $name }}: generateFromPattern('{{ $value.Pattern }}'),
-            {{- end }}
-          {{- end }}
-        }
+    const queryParams = {
+      {{- template "params" .SLO.Params.Query }}
+    }
 
-        const url = new URL(`{{ $.BaseUrl }}${applyPathParams('{{ .Pathname }}', pathParams)}`);
+    const url = new URL(`{{ $.BaseUrl }}${applyPathParams('{{ .Pathname }}', pathParams)}`);
 
-        for (const param of Object.keys(queryParams)) {
-            url.searchParams.append(param, queryParams[param]);
-        }
+    for (const param of Object.keys(queryParams)) {
+        url.searchParams.append(param, queryParams[param]);
+    }
 
-        http.{{ .Method }}(url.href);
-    });
+    http.
+    {{- if eq .Method "post" -}}
+    post
+    {{- else if eq .Method "put" -}}
+    put
+    {{- else if eq .Method "patch" -}}
+    patch
+    {{- else if eq .Method "delete" -}}
+    delete
+    {{- else -}}
+    get
+    {{- end -}}
+    (url.href);
+  });
   {{ end }}
 }
