@@ -81,3 +81,6 @@ paths:
 schemes:
 - http
 swagger: "2.0"
+x-perf-check:
+  duration: 3
+  users: 100

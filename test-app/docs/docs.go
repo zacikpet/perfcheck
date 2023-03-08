@@ -131,6 +131,10 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "x-perf-check": {
+        "duration": 3,
+        "users": 100
     }
 }`
 

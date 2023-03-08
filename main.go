@@ -43,8 +43,6 @@ func main() {
 
 	fmt.Println("Benchmark generated.")
 
-	return
-
 	_, err = exec.LookPath("k6")
 	check(err)
 

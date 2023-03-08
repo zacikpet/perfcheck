@@ -13,7 +13,9 @@ export const options = {
       'http_req_failed{group:::{{ .Pathname }}}': ['rate < {{ .SLO.ErrorRate }}'],
       {{- end }}
     {{- end }}
-  }
+  },
+  vus: {{ .Config.Users }},
+  duration: "{{ .Config.Duration }}s"
 }
 
 const pickRandom = (array) => {

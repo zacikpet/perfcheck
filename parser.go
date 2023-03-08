@@ -1,16 +1,20 @@
 package main
 
 import (
-	"bytes"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/pb33f/libopenapi"
 )
 
 type Api struct {
 	BaseUrl string
 	Paths   []Path
+	Config  Config
+}
+
+type Config struct {
+	Users    int
+	Duration int
 }
 
 type Path struct {
@@ -69,15 +73,8 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 
 			dict := operation.Extensions["x-perf-check"]
 
-			js, err := json.Marshal(dict)
-			check(err)
-
-			dec := json.NewDecoder(bytes.NewReader(js))
-			dec.DisallowUnknownFields()
-
 			var slo SLO
-			err = dec.Decode(&slo)
-			check(err)
+			parseJSON(dict, &slo)
 
 			paths = append(paths, Path{
 				Method:   method,
@@ -87,11 +84,17 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 		}
 	}
 
+	_config := model.Model.Extensions["x-perf-check"]
+
+	config := Config{Users: 100, Duration: 5} // default
+
+	parseJSON(_config, &config)
+
 	schemes := model.Model.Schemes
 
 	if len(schemes) == 0 {
 		panic("You must include at least one scheme (http, https)")
 	}
 
-	return Api{Paths: paths, BaseUrl: schemes[0] + "://" + model.Model.Host}
+	return Api{Paths: paths, BaseUrl: schemes[0] + "://" + model.Model.Host, Config: config}
 }
