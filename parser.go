@@ -13,8 +13,14 @@ type Api struct {
 }
 
 type Config struct {
-	Users    int
-	Duration int
+	Users    *int
+	Duration *int
+	Stages   []Stage
+}
+
+type Stage struct {
+	Duration string
+	Target   int
 }
 
 type Path struct {
@@ -86,7 +92,7 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 
 	_config := model.Model.Extensions["x-perf-check"]
 
-	config := Config{Users: 100, Duration: 5} // default
+	var config Config
 
 	parseJSON(_config, &config)
 

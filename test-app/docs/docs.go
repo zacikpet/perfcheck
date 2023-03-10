@@ -133,8 +133,12 @@ const docTemplate = `{
         }
     },
     "x-perf-check": {
-        "duration": 3,
-        "users": 100
+        "stages": [
+            {
+                "duration": "10s",
+                "target": 5
+            }
+        ]
     }
 }`
 

@@ -14,8 +14,19 @@ export const options = {
       {{- end }}
     {{- end }}
   },
+  {{- if .Config.Users }}
   vus: {{ .Config.Users }},
+  {{- end }}
+  {{- if .Config.Duration }}
   duration: "{{ .Config.Duration }}s"
+  {{- end }}
+  {{- if .Config.Stages }}
+  stages: [
+    {{- range .Config.Stages }}
+      { target: {{ .Target }}, duration: "{{ .Duration }}" }
+    {{- end }}
+  ]
+  {{- end }}
 }
 
 const pickRandom = (array) => {
