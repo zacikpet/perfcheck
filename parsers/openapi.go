@@ -1,60 +1,10 @@
-package main
+package parsers
 
 import (
 	"strings"
 
 	"github.com/pb33f/libopenapi"
 )
-
-type Api struct {
-	BaseUrl string
-	Paths   []Path
-	Config  Config
-}
-
-type Config struct {
-	Users    *int
-	Duration *int
-	Stages   []Stage
-}
-
-type Stage struct {
-	Duration string
-	Target   int
-}
-
-type Path struct {
-	Method   string
-	Pathname string
-	SLO      SLO
-}
-
-type SLO struct {
-	Latency   *int
-	ErrorRate *float64
-	Params    Params
-}
-
-type Examples struct {
-	Path *map[string]any
-}
-
-type Params struct {
-	Path  map[string]ParamDescription
-	Query map[string]ParamDescription
-}
-
-type ParamDescription struct {
-	Examples []any
-	Pattern  *string
-	Range    *RangeDescription
-}
-
-type RangeDescription struct {
-	Min  int
-	Max  int
-	Step int
-}
 
 func ParseOpenAPI(document libopenapi.Document) Api {
 	version := document.GetVersion()
@@ -79,13 +29,13 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 
 			dict := operation.Extensions["x-perf-check"]
 
-			var slo SLO
+			var slo PathDetail
 			parseJSON(dict, &slo)
 
 			paths = append(paths, Path{
 				Method:   method,
 				Pathname: pathname,
-				SLO:      slo,
+				Detail:   slo,
 			})
 		}
 	}

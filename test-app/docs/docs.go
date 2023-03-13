@@ -20,114 +20,10 @@ const docTemplate = `{
                 "summary": "Hello",
                 "responses": {},
                 "x-perf-check": {
-                    "errorRate": 0.1,
-                    "latency": 100
-                }
-            }
-        },
-        "/param/{x}": {
-            "get": {
-                "summary": "Example param",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "X param",
-                        "name": "x",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {},
-                "x-perf-check": {
-                    "errorRate": 0.1,
-                    "latency": 100,
-                    "params": {
-                        "path": {
-                            "x": {
-                                "examples": [
-                                    "abc",
-                                    "def"
-                                ]
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/pattern/{x}/{y}": {
-            "get": {
-                "summary": "Pattern param",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "X param",
-                        "name": "x",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {},
-                "x-perf-check": {
-                    "errorRate": 0.1,
-                    "latency": 100,
-                    "params": {
-                        "path": {
-                            "x": {
-                                "pattern": "uuid"
-                            },
-                            "y": {
-                                "pattern": "string(8)"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/range/{x}": {
-            "get": {
-                "summary": "Range param",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "X param",
-                        "name": "x",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {},
-                "x-perf-check": {
-                    "errorRate": 0.1,
-                    "latency": 100,
-                    "params": {
-                        "path": {
-                            "x": {
-                                "range": {
-                                    "max": 1000,
-                                    "min": 0
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/sleep": {
-            "get": {
-                "summary": "Sleep for n seconds",
-                "responses": {},
-                "x-perf-check": {
-                    "errorRate": 0.2,
-                    "latency": 250,
-                    "params": {
-                        "query": {
-                            "seconds": {
-                                "examples": [
-                                    1
-                                ]
-                            }
-                        }
-                    }
+                    "latency": [
+                        "avg \u003c 50",
+                        "min \u003c 50"
+                    ]
                 }
             }
         }
@@ -135,7 +31,7 @@ const docTemplate = `{
     "x-perf-check": {
         "stages": [
             {
-                "duration": "10s",
+                "duration": "1s",
                 "target": 5
             }
         ]

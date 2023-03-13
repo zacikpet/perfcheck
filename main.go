@@ -10,10 +10,22 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/pb33f/libopenapi"
+
+	"github.com/zacikpet/perf-check/parsers"
+	"github.com/zacikpet/perf-check/stat"
 )
+
+func check(err error) {
+	if err != nil {
+		panic(err.Error())
+	}
+}
 
 func main() {
 
+	// stat.AnalyzeData("test.jsonl")
+
+	// return
 	godotenv.Load(".env")
 
 	docsUrl := os.Getenv("DOCS_URL")
@@ -27,7 +39,7 @@ func main() {
 	document, err := libopenapi.NewDocument(body)
 	check(err)
 
-	model := ParseOpenAPI(document)
+	model := parsers.ParseOpenAPI(document)
 
 	tmpl, err := template.ParseFiles("templates/benchmark.js.tmpl")
 	check(err)
@@ -39,24 +51,29 @@ func main() {
 	check(err)
 	defer file.Close()
 
-	tmpl.Execute(file, model)
+	err = tmpl.Execute(file, model)
+	check(err)
 
 	fmt.Println("Benchmark generated.")
 
 	_, err = exec.LookPath("k6")
 	check(err)
 
-	cmd := exec.Command("k6", "run", file.Name())
+	dataFile := "test.jsonl"
+
+	cmd := exec.Command("k6", "run", file.Name(), "--out", fmt.Sprintf("json=%s", dataFile))
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 
 	err = cmd.Run()
 
+	stat.AnalyzeData("test.jsonl", model)
+
 	if err != nil {
-		fmt.Println("✋")
+		fmt.Println("k6 threshold did not pass")
 	} else {
-		fmt.Println("👌")
+		fmt.Println("k6 fine")
 	}
 
 }

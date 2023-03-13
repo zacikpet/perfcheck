@@ -6,11 +6,19 @@ import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 export const options = {
   thresholds: {
     {{- range .Paths }}
-      {{- if .SLO.Latency }}
-      'http_req_duration{group:::{{ .Pathname }}}': ['p(95) < {{ .SLO.Latency }}'],
-      {{- end }}
-      {{- if .SLO.ErrorRate }}
-      'http_req_failed{group:::{{ .Pathname }}}': ['rate < {{ .SLO.ErrorRate }}'],
+      {{- $pathname := .Pathname }}
+    'http_req_duration{group:::{{ $pathname }}}': [
+      {{- range .Detail.Latency -}}
+        {{- if .IsK6Supported -}}
+          '{{- . -}}', 
+        {{- end -}}
+      {{- end -}}
+    ],
+        
+      {{- range .Detail.ErrorRate }}
+        {{- if .IsK6Supported }}
+    'http_req_failed{group:::{{ $pathname }}}': ['{{ . }}'],
+        {{- end }}
       {{- end }}
     {{- end }}
   },
@@ -23,7 +31,7 @@ export const options = {
   {{- if .Config.Stages }}
   stages: [
     {{- range .Config.Stages }}
-      { target: {{ .Target }}, duration: "{{ .Duration }}" }
+    { target: {{ .Target }}, duration: "{{ .Duration }}" }
     {{- end }}
   ]
   {{- end }}
@@ -84,11 +92,11 @@ export default function () {
   {{- range .Paths }}
   group("{{ .Pathname }}", function () {
     const pathParams = {
-      {{- template "params" .SLO.Params.Path }}
+      {{- template "params" .Detail.Params.Path }}
     }
 
     const queryParams = {
-      {{- template "params" .SLO.Params.Query }}
+      {{- template "params" .Detail.Params.Query }}
     }
 
     const url = new URL(`{{ $.BaseUrl }}${applyPathParams('{{ .Pathname }}', pathParams)}`);
