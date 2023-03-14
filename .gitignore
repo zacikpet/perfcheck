@@ -1,3 +1,4 @@
 .env
 benchmarks/
 test-app/tmp/
+test.jsonl

@@ -17,10 +17,10 @@ const PORT = 8080
 
 // @Summary		Hello
 // @Router			/ [get]
-// @x-perf-check	{ "latency": ["avg < 50", "min < 50"] }
+// @x-perf-check	{ "latency": ["avg < 50", "min < 50", "avg_stat < 50"], "errorRate": ["avg_stat < 0.1"] }
 func Helloworld(g *gin.Context) {
 
-	sleep := rand.Intn(150)
+	sleep := rand.Intn(100)
 
 	time.Sleep(time.Millisecond * time.Duration(sleep))
 	g.JSON(http.StatusOK, "helloworld")

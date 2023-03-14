@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
+	"strconv"
 
 	"github.com/aclements/go-moremath/stats"
 	"github.com/zacikpet/perf-check/parsers"
@@ -50,29 +52,55 @@ func AnalyzeData(dataFile string, model parsers.Api) {
 		points = append(points, point)
 	}
 
-	AnalyzeMetric(points, "http_req_duration", "::/")
+	for _, path := range model.Paths {
+
+		for _, metric := range path.Detail.Latency {
+			AnalyzeMetric(metric, points, path.Pathname, "http_req_duration")
+		}
+
+		for _, metric := range path.Detail.ErrorRate {
+			AnalyzeMetric(metric, points, path.Pathname, "http_req_failed")
+		}
+	}
 }
 
-func AnalyzeMetric(points []DataPoint, metric string, group string) {
+func AnalyzeMetric(metric parsers.Metric, points []DataPoint, pathname string, metricName string) {
+	isAvgStat := regexp.MustCompile(`^\s*avg_stat\s*<\s*(\d+\.?\d*)\s*$`)
+
+	submatches := isAvgStat.FindStringSubmatch(string(metric))
+
+	if len(submatches) == 0 {
+		fmt.Printf("no match\n")
+	} else {
+		avgStat, err := strconv.ParseFloat(submatches[1], 64)
+		if err != nil {
+			panic(err)
+		}
+
+		fmt.Printf("match %f\n", avgStat)
+		AnalyzeAvgStat(points, metricName, fmt.Sprintf("::%s", pathname))
+	}
+}
+
+func AnalyzeAvgStat(points []DataPoint, name string, group string) {
 	var data []float64
 
 	for _, point := range points {
-		if point.Metric == metric && point.Data.Tags.Group != nil && *point.Data.Tags.Group == group {
+		if point.Metric == name && point.Data.Tags.Group != nil && *point.Data.Tags.Group == group {
 			data = append(data, point.Data.Value)
 		}
 	}
 
 	res, err := stats.OneSampleTTest(makeSample(data), 100, stats.LocationLess)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "Failed to perform one sample t-test. Reason: %s\n", err)
+		return
 	}
 
-	fmt.Println(res.P)
-
 	if res.P < alpha {
-		fmt.Println("Null hypothesis rejected. CI/CD pass.")
+		fmt.Printf("%s{%s} Null hypothesis rejected. CI/CD pass. p = %2f\n", name, group, res.P)
 	} else {
-		fmt.Println("Null hypothesis not rejected. CI/CD fail.")
+		fmt.Printf("%s{%s} Null hypothesis not rejected. CI/CD fail. p = %2f\n", name, group, res.P)
 	}
 
 }

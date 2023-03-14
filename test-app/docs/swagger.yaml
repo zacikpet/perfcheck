@@ -7,9 +7,12 @@ paths:
       responses: {}
       summary: Hello
       x-perf-check:
+        errorRate:
+        - avg_stat < 0.1
         latency:
         - avg < 50
         - min < 50
+        - avg_stat < 50
 schemes:
 - http
 swagger: "2.0"

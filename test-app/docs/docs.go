@@ -20,9 +20,13 @@ const docTemplate = `{
                 "summary": "Hello",
                 "responses": {},
                 "x-perf-check": {
+                    "errorRate": [
+                        "avg_stat \u003c 0.1"
+                    ],
                     "latency": [
                         "avg \u003c 50",
-                        "min \u003c 50"
+                        "min \u003c 50",
+                        "avg_stat \u003c 50"
                     ]
                 }
             }
