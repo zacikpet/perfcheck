@@ -21,25 +21,48 @@ func check(err error) {
 	}
 }
 
+func loadEnv(key string) string {
+
+	value, ok := os.LookupEnv(key)
+
+	if !ok {
+		panic(fmt.Sprintf("Missing env %s", key))
+	}
+
+	return value
+}
+
 func main() {
 
-	// stat.AnalyzeData("test.jsonl")
-
-	// return
 	godotenv.Load(".env")
 
-	docsUrl := os.Getenv("DOCS_URL")
+	source := loadEnv("SOURCE")
 
-	res, err := http.Get(docsUrl)
-	check(err)
+	var model parsers.Api
 
-	body, err := io.ReadAll(res.Body)
-	check(err)
+	if source == "swagger" {
+		docsUrl := loadEnv("DOCS_URL")
 
-	document, err := libopenapi.NewDocument(body)
-	check(err)
+		res, err := http.Get(docsUrl)
+		check(err)
 
-	model := parsers.ParseOpenAPI(document)
+		body, err := io.ReadAll(res.Body)
+		check(err)
+
+		document, err := libopenapi.NewDocument(body)
+		check(err)
+
+		model = parsers.ParseOpenAPI(document)
+	} else if source == "gcloud" {
+
+		projectId := loadEnv("GCLOUD_PROJECT_ID")
+		serviceId := loadEnv("GCLOUD_SERVICE_ID")
+
+		model = parsers.ParseGCloudSLOs(projectId, serviceId)
+
+	} else {
+		panic("Invalid source (swagger|gcloud)")
+	}
 
 	tmpl, err := template.ParseFiles("templates/benchmark.js.tmpl")
 	check(err)
