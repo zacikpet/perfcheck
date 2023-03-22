@@ -9,7 +9,7 @@ import (
 	"strconv"
 
 	"github.com/aclements/go-moremath/stats"
-	"github.com/zacikpet/perf-check/parsers"
+	"github.com/zacikpet/perfcheck/parsers"
 )
 
 const alpha = 0.05

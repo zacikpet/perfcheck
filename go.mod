@@ -1,4 +1,4 @@
-module github.com/zacikpet/perf-check
+module github.com/zacikpet/perfcheck
 
 go 1.19
 

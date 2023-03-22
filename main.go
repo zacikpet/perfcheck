@@ -11,8 +11,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/pb33f/libopenapi"
 
-	"github.com/zacikpet/perf-check/parsers"
-	"github.com/zacikpet/perf-check/stat"
+	"github.com/zacikpet/perfcheck/parsers"
+	"github.com/zacikpet/perfcheck/stat"
 )
 
 func check(err error) {
