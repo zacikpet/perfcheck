@@ -2,37 +2,17 @@
 
 
 This repository contains:
-- `perf-check`: a tool that generates benchmarks from a swagger documentation
-- a testing REST app that serves swagger documentation
+- `perf-check`: a tool that generates benchmarks from OpenApi documentation
+- a testing REST app that serves OpenAPI documentation
 
-## How to run
+## How to use
 
-### 1. Generate docs for `test-app` (optional)
+### 1. Environment variables
 
-Inside the `test-app` subdirectory, run:
+Add the following variables to your environment (`.env`)
 
-    swag init
-
-to generate swagger documentation from the source code. To install `swag`, see https://github.com/swaggo/swag.
-
-### 2. Run `test-app`
-
-Inside the `test-app` subdirectory, run:
-
-    go run main.go
-
-to launch a testing HTTP server. The docs will be served at:
-
-- http://localhost:8080/swagger/index.html (HTML)
-- http://localhost:8080/swagger/doc.json (JSON)
-
-### 3. Add environment variables
-
-Create a `.env` file with the following contents:
-
-    DOCS_URL=http://localhost:8080/swagger/doc.json
-
-This will tell `perf-check` the location and description of the service.
+    SOURCE=openapi
+    DOCS_URL={URL of your OpenAPI documentation in the JSON format}
 
 ### 4. Generate and run benchmark file
 

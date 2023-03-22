@@ -34,13 +34,13 @@ func loadEnv(key string) string {
 
 func main() {
 
-	godotenv.Load(".env")
+	godotenv.Load()
 
 	source := loadEnv("SOURCE")
 
 	var model parsers.Api
 
-	if source == "swagger" {
+	if source == "openapi" {
 		docsUrl := loadEnv("DOCS_URL")
 
 		res, err := http.Get(docsUrl)
@@ -61,7 +61,7 @@ func main() {
 		model = parsers.ParseGCloudSLOs(projectId, serviceId)
 
 	} else {
-		panic("Invalid source (swagger|gcloud)")
+		panic("Invalid source (openapi|gcloud)")
 	}
 
 	tmpl, err := template.ParseFiles("templates/benchmark.js.tmpl")
