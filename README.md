@@ -16,7 +16,8 @@
             "get": {
                 "summary": "Hello World",
                 "x-perfcheck": {
-                    "latency": ["avg < 50"]
+                    "latency": ["avg < 50"],
+                    "errorRate": ["rate < 0.01"]
                 }
             }
         }
@@ -41,6 +42,36 @@ go install github.com/zacikpet/perfcheck
 perfcheck test --source=openapi --docsUrl=http://localhost:8080/swagger/doc.json
 ```
 
-## How to use with Google Cloud SLOs
+### Global options
 
-TODO
+| key | meaning |
+| - | - |
+| `vus` | [k6 vus](https://k6.io/docs/using-k6/k6-options/reference/#vus) |
+| `duration` | [k6 duration](https://k6.io/docs/using-k6/k6-options/reference/#duration) |
+| `stages` | [k6 stages](https://k6.io/docs/using-k6/k6-options/reference/#stages) |
+
+### Per-endpoint options
+
+| key | meaning |
+| - | - |
+| `latency` | array of objectives for the latency is ms |
+| `errorRate` | array of objectives for the error rate |
+
+Latency objectives can contain the following metrics:
+
+| metric | meaning |
+| - | - |
+| `avg_stat` | Statistically significant mean value |
+| `avg`, `med` | Average/median value |
+| `min`, `max` | Minimum/maximum value |
+| `p(N)` | Specific percentile `N` |
+
+For more info, see [k6 trends](https://k6.io/docs/javascript-api/k6-metrics/trend/).
+
+Error rate objectives can contain the following metrics:
+
+| metric | meaning |
+| - | - |
+| `rate` | ratio of errors to all requests |
+
+## How to use with Google Cloud SLOs
