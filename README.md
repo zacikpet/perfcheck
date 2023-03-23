@@ -31,10 +31,11 @@ In this schema, the requirement for `GET /` is that the average latency stays be
 
 2. Run the server with OpenAPI docs (for example: `http://localhost:8080/swagger/doc.json`)
 
-3. Run perfcheck
+3. Install and run perfcheck
+
+`go install github.com/zacikpet/perfcheck`
 
 `perfcheck test --source=openapi --docsUrl=http://localhost:8080/swagger/doc.json`
 ## How to use with Google Cloud SLOs
 
 TODO
-
