@@ -1,102 +1,86 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"net/http"
+	"log"
 	"os"
-	"os/exec"
-	"text/template"
 
 	"github.com/joho/godotenv"
-	"github.com/pb33f/libopenapi"
-
-	"github.com/zacikpet/perfcheck/parsers"
-	"github.com/zacikpet/perfcheck/stat"
+	"github.com/urfave/cli/v2"
+	"github.com/zacikpet/perfcheck/pkg/perfcheck"
 )
-
-func check(err error) {
-	if err != nil {
-		panic(err.Error())
-	}
-}
-
-func loadEnv(key string) string {
-
-	value, ok := os.LookupEnv(key)
-
-	if !ok {
-		panic(fmt.Sprintf("Missing env %s", key))
-	}
-
-	return value
-}
 
 func main() {
 
 	godotenv.Load()
 
-	source := loadEnv("SOURCE")
-
-	var model parsers.Api
-
-	if source == "openapi" {
-		docsUrl := loadEnv("DOCS_URL")
-
-		res, err := http.Get(docsUrl)
-		check(err)
-
-		body, err := io.ReadAll(res.Body)
-		check(err)
-
-		document, err := libopenapi.NewDocument(body)
-		check(err)
-
-		model = parsers.ParseOpenAPI(document)
-	} else if source == "gcloud" {
-
-		projectId := loadEnv("GCLOUD_PROJECT_ID")
-		serviceId := loadEnv("GCLOUD_SERVICE_ID")
-
-		model = parsers.ParseGCloudSLOs(projectId, serviceId)
-
-	} else {
-		panic("Invalid source (openapi|gcloud)")
+	app := &cli.App{
+		Name:  "perfcheck",
+		Usage: "Automatic benchmarks of APIs",
+		Commands: []*cli.Command{
+			{
+				Name:    "test",
+				Aliases: []string{"t"},
+				Usage:   "test a service",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "source",
+						Aliases: []string{"s"},
+						Value:   "openapi",
+						Usage:   "Source of the SLOs. Allowed: openapi, gcloud",
+						EnvVars: []string{"SOURCE"},
+					},
+					&cli.StringFlag{
+						Name:    "docsUrl",
+						Aliases: []string{"d"},
+						Usage:   "URL of the OpenAPI documentation",
+						EnvVars: []string{"DOCS_URL"},
+					},
+					&cli.StringFlag{
+						Name:    "gcloudProjectId",
+						Usage:   "Google Cloud Project ID",
+						EnvVars: []string{"GCLOUD_PROJECT_ID"},
+					},
+					&cli.StringFlag{
+						Name:    "gcloudServiceId",
+						Usage:   "Google Cloud Service ID",
+						EnvVars: []string{"GCLOUD_SERVICE_ID"},
+					},
+					&cli.StringFlag{
+						Name:    "template",
+						Value:   "templates/benchmark.js.tmpl",
+						Usage:   "Template file for the k6 benchmark",
+						EnvVars: []string{"TEMPLATE"},
+					},
+					&cli.StringFlag{
+						Name:    "outFile",
+						Value:   "benchmarks/benchmark.js",
+						Usage:   "Output file for the k6 benchmark",
+						EnvVars: []string{"OUT_FILE"},
+					},
+					&cli.StringFlag{
+						Name:    "k6DataFile",
+						Value:   "k6.jsonl",
+						Usage:   "Output file for the k6 benchmark data",
+						EnvVars: []string{"K6_DATA_FILE"},
+					},
+				},
+				Action: func(ctx *cli.Context) error {
+					perfcheck.Test(
+						ctx.String("source"),
+						ctx.String("docsUrl"),
+						ctx.String("gcloudProjectId"),
+						ctx.String("gcloudServiceId"),
+						ctx.String("template"),
+						ctx.String("outFile"),
+						ctx.String("k6DataFile"),
+					)
+					return nil
+				},
+			},
+		},
 	}
 
-	tmpl, err := template.ParseFiles("templates/benchmark.js.tmpl")
-	check(err)
-
-	err = os.MkdirAll("benchmarks", os.ModePerm)
-	check(err)
-
-	file, err := os.Create("benchmarks/benchmark.js")
-	check(err)
-	defer file.Close()
-
-	err = tmpl.Execute(file, model)
-	check(err)
-
-	fmt.Println("Benchmark generated.")
-
-	_, err = exec.LookPath("k6")
-	check(err)
-
-	dataFile := "test.jsonl"
-
-	cmd := exec.Command("k6", "run", file.Name(), "--out", fmt.Sprintf("json=%s", dataFile))
-
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	err = cmd.Run()
-
-	stat.AnalyzeData("test.jsonl", model)
-
-	if err != nil {
-		fmt.Println("k6 threshold did not pass")
-	} else {
-		fmt.Println("k6 fine")
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
-
 }

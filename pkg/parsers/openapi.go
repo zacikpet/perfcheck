@@ -1,10 +1,36 @@
 package parsers
 
 import (
+	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"strings"
 
 	"github.com/pb33f/libopenapi"
 )
+
+func FetchOpenAPI(url string) libopenapi.Document {
+	res, err := http.Get(url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to GET %s\n", url)
+		panic(err)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Invalid content at %s\n", url)
+		panic(err)
+	}
+
+	document, err := libopenapi.NewDocument(body)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, "Failed to parse OpenApi document.")
+		panic(err)
+	}
+
+	return document
+}
 
 func ParseOpenAPI(document libopenapi.Document) Api {
 	version := document.GetVersion()

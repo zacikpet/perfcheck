@@ -1,4 +1,4 @@
 .env
 benchmarks/
 test.jsonl
-perfcheck
+
