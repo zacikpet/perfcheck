@@ -29,7 +29,7 @@
 ```
 In this schema, the requirement for `GET /` is that the average latency stays below 50ms. The global `x-perfcheck` property defines the duration of the test and number of virtual users. You can also define mulitple test stages (see [k6 stages](https://k6.io/docs/using-k6/k6-options/reference/#stages)).
 
-2. Run the server with OpenAPI docs (for example: `http://localhost:8080/swagger/doc.json`)
+2. Run the server with OpenAPI docs (for example: http://localhost:8080/swagger/doc.json)
 
 3. Install and run perfcheck
 
