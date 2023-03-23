@@ -5,7 +5,6 @@ go 1.19
 require (
 	cloud.google.com/go/monitoring v1.13.0
 	github.com/aclements/go-moremath v0.0.0-20210112150236-f10218a38794
-	github.com/joho/godotenv v1.5.1
 	github.com/pb33f/libopenapi v0.5.1
 	github.com/urfave/cli/v2 v2.25.0
 	google.golang.org/api v0.110.0

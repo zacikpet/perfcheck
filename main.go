@@ -4,14 +4,11 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v2"
 	"github.com/zacikpet/perfcheck/pkg/perfcheck"
 )
 
 func main() {
-
-	godotenv.Load()
 
 	app := &cli.App{
 		Name:  "perfcheck",
@@ -25,7 +22,6 @@ func main() {
 					&cli.StringFlag{
 						Name:    "source",
 						Aliases: []string{"s"},
-						Value:   "openapi",
 						Usage:   "Source of the SLOs. Allowed: openapi, gcloud",
 						EnvVars: []string{"SOURCE"},
 					},

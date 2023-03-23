@@ -1,23 +1,40 @@
-# perf-check
+**perfcheck** is a testing automation tool used to generate k6 benchmarks from service level objectives (SLOs)
 
+## How to use with OpenAPI
 
-This repository contains:
-- `perf-check`: a tool that generates benchmarks from OpenApi documentation
-- a testing REST app that serves OpenAPI documentation
+1. Add custom `x-perfcheck` annotations to your OpenAPI documentation. Example OpenAPI 2.0 JSON schema:
 
-## How to use
+```json
+{
+    "schemes": ["http"],
+    "swagger": "2.0",
+    "info": {
+        "title": "Example API",
+    },
+    "paths": {
+        "/": {
+            "get": {
+                "summary": "Hello World",
+                "x-perfcheck": {
+                    "latency": ["avg < 50"]
+                }
+            }
+        }
+    },
+    "x-perfcheck": {
+        "vus": 100,
+        "duration": "10s"
+    }
+}
+```
+In this schema, the requirement for `GET /` is that the average latency stays below 50ms. The global `x-perfcheck` property defines the duration of the test and number of virtual users. You can also define mulitple test stages (see [k6 stages](https://k6.io/docs/using-k6/k6-options/reference/#stages)).
 
-### 1. Environment variables
+2. Run the server with OpenAPI docs (for example: `http://localhost:8080/swagger/doc.json`)
 
-Add the following variables to your environment (`.env`)
+3. Run perfcheck
 
-    SOURCE=openapi
-    DOCS_URL={URL of your OpenAPI documentation in the JSON format}
+`perfcheck test --source=openapi --docsUrl=http://localhost:8080/swagger/doc.json`
+## How to use with Google Cloud SLOs
 
-### 4. Generate and run benchmark file
+TODO
 
-Inside the root directory, run:
-
-    go run *.go
-
-to generate a `benchmarks/benchmark.js` file. The file is automatically ran using the `k6` binary in your path. If you do not have `k6` installed, this operation will fail.

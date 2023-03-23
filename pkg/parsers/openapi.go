@@ -53,7 +53,7 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 
 		for method, operation := range operations {
 
-			dict := operation.Extensions["x-perf-check"]
+			dict := operation.Extensions["x-perfcheck"]
 
 			var slo PathDetail
 			parseJSON(dict, &slo)
@@ -66,7 +66,7 @@ func parseOpenAPIv2(document libopenapi.Document) Api {
 		}
 	}
 
-	_config := model.Model.Extensions["x-perf-check"]
+	_config := model.Model.Extensions["x-perfcheck"]
 
 	var config Config
 
