@@ -4,7 +4,6 @@ go 1.19
 
 require (
 	cloud.google.com/go/monitoring v1.13.0
-	cloud.google.com/go/run v0.9.0
 	github.com/aclements/go-moremath v0.0.0-20210112150236-f10218a38794
 	github.com/pb33f/libopenapi v0.5.1
 	github.com/urfave/cli/v2 v2.25.0
@@ -12,11 +11,8 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute v1.19.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
-	cloud.google.com/go/iam v0.13.0 // indirect
-	cloud.google.com/go/longrunning v0.4.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
