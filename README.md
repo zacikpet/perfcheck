@@ -39,7 +39,7 @@ go install github.com/zacikpet/perfcheck
 ```
 
 ```bash
-perfcheck test --source=openapi --docsUrl=http://localhost:8080/swagger/doc.json
+perfcheck test --source openapi --docsUrl http://localhost:8080/swagger/doc.json
 ```
 
 ### Global options
@@ -75,3 +75,41 @@ Error rate objectives can contain the following metrics:
 | `rate` | ratio of errors to all requests |
 
 ## How to use with Google Cloud SLOs
+
+1. Create a [Google Cloud SLO](https://cloud.google.com/stackdriver/docs/solutions/slo-monitoring/ui/create-slo)
+
+
+
+### Support table:
+
+Currently supported SLI metrics are `Availability` and `Latency`.
+
+| Metric | Request-based SLI | Window-based SLI |
+| - | - | - |
+| Availability | ✅ | ❌
+| Latency | ✅ | ❌
+| Custom | ❌ | ❌ |
+
+2. Set your default google credentials using the Google Cloud CLI
+
+```bash
+gcloud auth login
+```
+
+3. Install and run `perfcheck`
+
+```bash
+go install github.com/zacikpet/perfcheck
+```
+
+```bash
+perfcheck test \
+    --source gcloud \
+    --gcloudProjectId [your-project-id] \
+    --gcloudServiceId [id-of-your-monitoring-service] \
+    --gcloudServiceUrl [url-of-your-service]
+```
+
+**Warning: Using with google cloud only tests your root path!**
+
+
