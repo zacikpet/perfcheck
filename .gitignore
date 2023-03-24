@@ -1,4 +1,4 @@
 .env
 benchmarks/
-test.jsonl
+k6.jsonl
 
