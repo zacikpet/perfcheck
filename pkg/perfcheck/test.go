@@ -7,7 +7,17 @@ import (
 	"github.com/zacikpet/perfcheck/pkg/stat"
 )
 
-func Test(source string, docsUrl string, projectId string, serviceId string, template string, outFile string, k6DataFile string) {
+func Test(
+	source string,
+	docsUrl string,
+	projectId string,
+	serviceId string,
+	serviceName string,
+	location string,
+	template string,
+	outFile string,
+	k6DataFile string,
+) {
 
 	var model parsers.Api
 
@@ -17,7 +27,7 @@ func Test(source string, docsUrl string, projectId string, serviceId string, tem
 		model = parsers.ParseOpenAPI(document)
 
 	case "gcloud":
-		model = parsers.ParseGCloudSLOs(projectId, serviceId)
+		model = parsers.ParseGCloudSLOs(projectId, serviceId, serviceName, location, docsUrl)
 
 	default:
 		panic(fmt.Sprintf("Invalid source %s", source))

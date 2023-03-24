@@ -42,6 +42,16 @@ func main() {
 						EnvVars: []string{"GCLOUD_SERVICE_ID"},
 					},
 					&cli.StringFlag{
+						Name:    "gcloudServiceName",
+						Usage:   "Google Cloud Service Name",
+						EnvVars: []string{"GCLOUD_SERVICE_ID"},
+					},
+					&cli.StringFlag{
+						Name:    "gcloudLocation",
+						Usage:   "Google Cloud Location, i.e. us-central1",
+						EnvVars: []string{"GCLOUD_SERVICE_ID"},
+					},
+					&cli.StringFlag{
 						Name:    "template",
 						Value:   "templates/benchmark.js.tmpl",
 						Usage:   "Template file for the k6 benchmark",
@@ -66,6 +76,8 @@ func main() {
 						ctx.String("docsUrl"),
 						ctx.String("gcloudProjectId"),
 						ctx.String("gcloudServiceId"),
+						ctx.String("gcloudServiceName"),
+						ctx.String("gcloudLocation"),
 						ctx.String("template"),
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),
