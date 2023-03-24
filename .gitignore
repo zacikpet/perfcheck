@@ -1,4 +1,4 @@
 .env
 benchmarks/
 k6.jsonl
-
+/perfcheck
