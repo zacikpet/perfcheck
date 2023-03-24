@@ -8,12 +8,10 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	run "cloud.google.com/go/run/apiv2"
-	"cloud.google.com/go/run/apiv2/runpb"
 	"google.golang.org/api/iterator"
 )
 
-func ParseGCloudSLOs(projectId string, serviceId string, serviceName string, location string, docsUrl string) Api {
+func ParseGCloudSLOs(projectId string, serviceId string, serviceUrl string, docsUrl string) Api {
 	ctx := context.Background()
 
 	monitoringClient, err := monitoring.NewServiceMonitoringClient(ctx)
@@ -49,18 +47,8 @@ func ParseGCloudSLOs(projectId string, serviceId string, serviceName string, loc
 		}
 	}
 
-	name := fmt.Sprintf("projects/%s/locations/%s/services/%s", projectId, location, serviceName)
-
-	servicesClient, err := run.NewServicesClient(ctx)
-	check(err)
-	getServiceReq := &runpb.GetServiceRequest{
-		Name: name,
-	}
-	service, err := servicesClient.GetService(ctx, getServiceReq)
-	check(err)
-
 	return Api{
-		BaseUrl: service.Uri,
+		BaseUrl: serviceUrl,
 		Paths: []Path{
 			{
 				Method:   "GET",

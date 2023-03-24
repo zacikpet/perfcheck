@@ -42,14 +42,9 @@ func main() {
 						EnvVars: []string{"GCLOUD_SERVICE_ID"},
 					},
 					&cli.StringFlag{
-						Name:    "gcloudServiceName",
-						Usage:   "Google Cloud Service Name",
-						EnvVars: []string{"GCLOUD_SERVICE_ID"},
-					},
-					&cli.StringFlag{
-						Name:    "gcloudLocation",
-						Usage:   "Google Cloud Location, i.e. us-central1",
-						EnvVars: []string{"GCLOUD_SERVICE_ID"},
+						Name:    "gcloudServiceUrl",
+						Usage:   "Google Cloud Service URL",
+						EnvVars: []string{"GCLOUD_SERVICE_URL"},
 					},
 					&cli.StringFlag{
 						Name:    "template",
@@ -76,8 +71,7 @@ func main() {
 						ctx.String("docsUrl"),
 						ctx.String("gcloudProjectId"),
 						ctx.String("gcloudServiceId"),
-						ctx.String("gcloudServiceName"),
-						ctx.String("gcloudLocation"),
+						ctx.String("gcloudServiceUrl"),
 						ctx.String("template"),
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),

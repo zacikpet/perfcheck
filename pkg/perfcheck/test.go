@@ -12,13 +12,11 @@ func Test(
 	docsUrl string,
 	projectId string,
 	serviceId string,
-	serviceName string,
-	location string,
+	serviceUrl string,
 	template string,
 	outFile string,
 	k6DataFile string,
 ) {
-
 	var model parsers.Api
 
 	switch source {
@@ -27,7 +25,7 @@ func Test(
 		model = parsers.ParseOpenAPI(document)
 
 	case "gcloud":
-		model = parsers.ParseGCloudSLOs(projectId, serviceId, serviceName, location, docsUrl)
+		model = parsers.ParseGCloudSLOs(projectId, serviceId, serviceUrl, docsUrl)
 
 	default:
 		panic(fmt.Sprintf("Invalid source %s", source))
@@ -37,7 +35,7 @@ func Test(
 
 	k6Ok := RunK6(benchmark, k6DataFile)
 
-	stat.AnalyzeData("test.jsonl", model)
+	stat.AnalyzeData(outFile, model)
 
 	if k6Ok {
 		fmt.Println("k6 fine")
