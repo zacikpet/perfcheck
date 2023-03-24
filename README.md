@@ -55,7 +55,7 @@ perfcheck test --source openapi --docsUrl http://localhost:8080/swagger/doc.json
 
 | key | meaning |
 | - | - |
-| `latency` | array of objectives for the latency is ms |
+| `latency` | array of objectives for the latency in ms |
 | `errorRate` | array of objectives for the error rate |
 
 Latency objectives can contain the following metrics:

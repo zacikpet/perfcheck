@@ -66,7 +66,7 @@ func main() {
 					},
 				},
 				Action: func(ctx *cli.Context) error {
-					perfcheck.Test(
+					return perfcheck.Test(
 						ctx.String("source"),
 						ctx.String("docsUrl"),
 						ctx.String("gcloudProjectId"),
@@ -76,7 +76,6 @@ func main() {
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),
 					)
-					return nil
 				},
 			},
 		},

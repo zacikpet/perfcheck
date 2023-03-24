@@ -31,10 +31,11 @@ type DataTags struct {
 	Group            *string `json:"group"`
 }
 
-func AnalyzeData(dataFile string, model parsers.Api) {
+func AnalyzeData(dataFile string, model parsers.Api) bool {
 	file, err := os.Open(dataFile)
 	if err != nil {
-		panic(err.Error())
+		fmt.Fprintf(os.Stderr, "Failed to open data file %s\n", dataFile)
+		panic(err)
 	}
 
 	defer file.Close()
@@ -52,37 +53,60 @@ func AnalyzeData(dataFile string, model parsers.Api) {
 		points = append(points, point)
 	}
 
+	allOk := true
+
 	for _, path := range model.Paths {
 
 		for _, metric := range path.Detail.Latency {
-			AnalyzeMetric(metric, points, path.Pathname, "http_req_duration")
+			isStat, ok := AnalyzeMetric(metric, points, path.Pathname, "http_req_duration")
+			if !isStat {
+				continue
+			}
+
+			if ok {
+				allOk = false
+				fmt.Printf("%s (%s): OK\n", path.Pathname, metric)
+			} else {
+				fmt.Printf("%s (%s): Failed\n", path.Pathname, metric)
+			}
 		}
 
 		for _, metric := range path.Detail.ErrorRate {
-			AnalyzeMetric(metric, points, path.Pathname, "http_req_failed")
+			isStat, ok := AnalyzeMetric(metric, points, path.Pathname, "http_req_failed")
+			if !isStat {
+				continue
+			}
+			if ok {
+				allOk = false
+				fmt.Printf("%s (%s): OK\n", path.Pathname, metric)
+			} else {
+				fmt.Printf("%s (%s): Failed\n", path.Pathname, metric)
+			}
 		}
 	}
+
+	return allOk
 }
 
-func AnalyzeMetric(metric parsers.Metric, points []DataPoint, pathname string, metricName string) {
+func AnalyzeMetric(metric parsers.Metric, points []DataPoint, pathname string, metricName string) (bool, bool) {
 	isAvgStat := regexp.MustCompile(`^\s*avg_stat\s*<\s*(\d+\.?\d*)\s*$`)
 
 	submatches := isAvgStat.FindStringSubmatch(string(metric))
 
 	if len(submatches) == 0 {
-		fmt.Printf("no match\n")
+		return false, true
 	} else {
 		avgStat, err := strconv.ParseFloat(submatches[1], 64)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "Invalid metric %s\n", metric)
 		}
 
-		fmt.Printf("match %f\n", avgStat)
-		AnalyzeAvgStat(points, metricName, fmt.Sprintf("::%s", pathname))
+		ok := AnalyzeAvgStat(points, metricName, fmt.Sprintf("::%s", pathname), avgStat)
+		return true, ok
 	}
 }
 
-func AnalyzeAvgStat(points []DataPoint, name string, group string) {
+func AnalyzeAvgStat(points []DataPoint, name string, group string, target float64) bool {
 	var data []float64
 
 	for _, point := range points {
@@ -91,16 +115,11 @@ func AnalyzeAvgStat(points []DataPoint, name string, group string) {
 		}
 	}
 
-	res, err := stats.OneSampleTTest(makeSample(data), 100, stats.LocationLess)
+	res, err := stats.OneSampleTTest(makeSample(data), target, stats.LocationLess)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to perform one sample t-test. Reason: %s\n", err)
-		return
+		return true
 	}
 
-	if res.P < alpha {
-		fmt.Printf("%s{%s} Null hypothesis rejected. CI/CD pass. p = %2f\n", name, group, res.P)
-	} else {
-		fmt.Printf("%s{%s} Null hypothesis not rejected. CI/CD fail. p = %2f\n", name, group, res.P)
-	}
-
+	return res.P < alpha
 }

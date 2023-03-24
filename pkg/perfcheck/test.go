@@ -1,6 +1,7 @@
 package perfcheck
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/zacikpet/perfcheck/pkg/parsers"
@@ -16,7 +17,7 @@ func Test(
 	template string,
 	outFile string,
 	k6DataFile string,
-) {
+) error {
 	var model parsers.Api
 
 	switch source {
@@ -35,11 +36,15 @@ func Test(
 
 	k6Ok := RunK6(benchmark, k6DataFile)
 
-	stat.AnalyzeData(outFile, model)
+	statOk := stat.AnalyzeData(outFile, model)
 
-	if k6Ok {
-		fmt.Println("k6 fine")
-	} else {
-		fmt.Println("k6 threshold did not pass")
+	if !k6Ok {
+		return errors.New("k6: service does not conform to the service-level objectives")
 	}
+
+	if !statOk {
+		return errors.New("perfcheck/stat: service does not conform to the service-level objectives")
+	}
+
+	return nil
 }
