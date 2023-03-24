@@ -11,20 +11,21 @@
     "info": {
         "title": "Example API",
     },
+    "host": "localhost:8080",
     "paths": {
         "/": {
             "get": {
-                "summary": "Hello World",
+                "summary": "Hello",
                 "x-perfcheck": {
-                    "latency": ["avg < 50"],
-                    "errorRate": ["rate < 0.01"]
+                    "errorRate": ["rate < 0.1"],
+                    "latency": ["avg < 50"]
                 }
             }
         }
     },
     "x-perfcheck": {
-        "vus": 100,
-        "duration": "10s"
+        "duration": "10s",
+        "vus": 5
     }
 }
 ```
@@ -80,7 +81,7 @@ Error rate objectives can contain the following metrics:
 
 
 
-### Support table:
+### Support table
 
 Currently supported SLI metrics are `Availability` and `Latency`.
 
