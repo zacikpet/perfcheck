@@ -17,6 +17,7 @@ func Test(
 	template string,
 	outFile string,
 	k6DataFile string,
+	noK6 bool,
 ) error {
 	var model parsers.Api
 
@@ -38,7 +39,7 @@ func Test(
 
 	statOk := stat.AnalyzeData(outFile, model)
 
-	if !k6Ok {
+	if !noK6 && !k6Ok {
 		return errors.New("k6: service does not conform to the service-level objectives")
 	}
 

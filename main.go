@@ -64,6 +64,12 @@ func main() {
 						Usage:   "Output file for the k6 benchmark data",
 						EnvVars: []string{"K6_DATA_FILE"},
 					},
+					&cli.BoolFlag{
+						Name:    "no-k6",
+						Value:   false,
+						Usage:   "Don't run k6 automatically",
+						EnvVars: []string{"NO_K6"},
+					},
 				},
 				Action: func(ctx *cli.Context) error {
 					return perfcheck.Test(
@@ -75,6 +81,7 @@ func main() {
 						ctx.String("template"),
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),
+						ctx.Bool("no-k6"),
 					)
 				},
 			},
