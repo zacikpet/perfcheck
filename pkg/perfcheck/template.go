@@ -7,17 +7,16 @@ import (
 	"text/template"
 
 	"github.com/zacikpet/perfcheck/pkg/parsers"
+	"github.com/zacikpet/perfcheck/templates"
 )
 
 func generateBenchmark(in string, out string, model parsers.Api) *os.File {
 
-	tmpl, err := template.ParseFiles(in)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Template %s not found.\n", in)
-		panic(err)
-	}
+	tmpl := template.New("default")
 
-	err = os.MkdirAll(filepath.Dir(out), os.ModePerm)
+	tmpl.Parse(templates.DefaultTemplate)
+
+	err := os.MkdirAll(filepath.Dir(out), os.ModePerm)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to create output directory %s.\n", filepath.Dir(out))
 		panic(err)
@@ -32,7 +31,8 @@ func generateBenchmark(in string, out string, model parsers.Api) *os.File {
 
 	err = tmpl.Execute(file, model)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to execute benchmark %s\n", in)
+		fmt.Fprintf(os.Stderr, "Failed to execute template %s\n", in)
+		panic(err)
 	}
 
 	return file

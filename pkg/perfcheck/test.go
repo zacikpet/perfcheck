@@ -19,6 +19,7 @@ func Test(
 	k6DataFile string,
 	noK6 bool,
 ) error {
+
 	var model parsers.Api
 
 	switch source {
