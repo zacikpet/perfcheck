@@ -36,13 +36,14 @@ func Test(
 
 	benchmark := generateBenchmark(template, outFile, model)
 
-	k6Ok := RunK6(benchmark, k6DataFile)
+	if !noK6 {
+		ok := RunK6(benchmark, k6DataFile)
+		if !ok {
+			return errors.New("k6: service does not conform to the service-level objectives")
+		}
+	}
 
 	statOk := stat.AnalyzeData(outFile, model)
-
-	if !noK6 && !k6Ok {
-		return errors.New("k6: service does not conform to the service-level objectives")
-	}
 
 	if !statOk {
 		return errors.New("perfcheck/stat: service does not conform to the service-level objectives")
