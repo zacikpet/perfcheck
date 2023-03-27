@@ -47,12 +47,6 @@ func main() {
 						EnvVars: []string{"GCLOUD_SERVICE_URL"},
 					},
 					&cli.StringFlag{
-						Name:    "template",
-						Value:   "templates/benchmark.js.tmpl",
-						Usage:   "Template file for the k6 benchmark",
-						EnvVars: []string{"TEMPLATE"},
-					},
-					&cli.StringFlag{
 						Name:    "outFile",
 						Value:   "benchmarks/benchmark.js",
 						Usage:   "Output file for the k6 benchmark",
@@ -78,7 +72,6 @@ func main() {
 						ctx.String("gcloudProjectId"),
 						ctx.String("gcloudServiceId"),
 						ctx.String("gcloudServiceUrl"),
-						ctx.String("template"),
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),
 						ctx.Bool("no-k6"),

@@ -10,7 +10,7 @@ import (
 	"github.com/zacikpet/perfcheck/templates"
 )
 
-func generateBenchmark(in string, out string, model parsers.Api) *os.File {
+func generateBenchmark(out string, model parsers.Api) *os.File {
 
 	tmpl := template.New("default")
 
@@ -31,7 +31,7 @@ func generateBenchmark(in string, out string, model parsers.Api) *os.File {
 
 	err = tmpl.Execute(file, model)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to execute template %s\n", in)
+		fmt.Fprintf(os.Stderr, "Failed to execute template %s\n", tmpl.Name())
 		panic(err)
 	}
 
