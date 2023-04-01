@@ -14,6 +14,7 @@ func Test(
 	projectId string,
 	serviceId string,
 	serviceUrl string,
+	template string,
 	outFile string,
 	k6DataFile string,
 	noK6 bool,
@@ -33,7 +34,7 @@ func Test(
 		panic(fmt.Sprintf("Invalid source %s", source))
 	}
 
-	benchmark := generateBenchmark(outFile, model)
+	benchmark := generateBenchmark(template, outFile, model)
 
 	if !noK6 {
 		ok := RunK6(benchmark, k6DataFile)

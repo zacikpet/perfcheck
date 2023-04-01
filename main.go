@@ -15,6 +15,22 @@ func main() {
 		Usage: "Automatic benchmarks of APIs",
 		Commands: []*cli.Command{
 			{
+				Name:  "get-template",
+				Usage: "Output default template to file",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:    "outFile",
+						Aliases: []string{"o"},
+						Usage:   "Name of output file",
+						Value:   "benchmark.js.tmpl",
+						EnvVars: []string{"OUT_FILE"},
+					},
+				},
+				Action: func(ctx *cli.Context) error {
+					return perfcheck.GetTemplate(ctx.String("outFile"))
+				},
+			},
+			{
 				Name:    "test",
 				Aliases: []string{"t"},
 				Usage:   "test a service",
@@ -47,6 +63,12 @@ func main() {
 						EnvVars: []string{"GCLOUD_SERVICE_URL"},
 					},
 					&cli.StringFlag{
+						Name:    "templateFile",
+						Value:   "",
+						Usage:   "Template file for the benchmark",
+						EnvVars: []string{"TEMPLATE_FILE"},
+					},
+					&cli.StringFlag{
 						Name:    "outFile",
 						Value:   "benchmarks/benchmark.js",
 						Usage:   "Output file for the k6 benchmark",
@@ -72,6 +94,7 @@ func main() {
 						ctx.String("gcloudProjectId"),
 						ctx.String("gcloudServiceId"),
 						ctx.String("gcloudServiceUrl"),
+						ctx.String("templateFile"),
 						ctx.String("outFile"),
 						ctx.String("k6DataFile"),
 						ctx.Bool("no-k6"),
