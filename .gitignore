@@ -2,3 +2,5 @@
 benchmarks/
 k6.jsonl
 /perfcheck
+
+dist/
