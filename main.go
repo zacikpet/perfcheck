@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/urfave/cli/v2"
-	"github.com/zacikpet/perfcheck/pkg/perfcheck"
+	"github.com/zacikpet/perfcheck/pkg/benchmark"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 					},
 				},
 				Action: func(ctx *cli.Context) error {
-					return perfcheck.GetTemplate(ctx.String("outFile"))
+					return benchmark.GetTemplate(ctx.String("outFile"))
 				},
 			},
 			{
@@ -88,7 +88,7 @@ func main() {
 					},
 				},
 				Action: func(ctx *cli.Context) error {
-					return perfcheck.Test(
+					return benchmark.Test(
 						ctx.String("source"),
 						ctx.String("docsUrl"),
 						ctx.String("gcloudProjectId"),

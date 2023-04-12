@@ -1,4 +1,4 @@
-package perfcheck
+package benchmark
 
 import (
 	"fmt"
