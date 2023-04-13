@@ -31,9 +31,10 @@ type Path struct {
 }
 
 type PathDetail struct {
-	Latency   []Metric
-	ErrorRate []Metric
-	Params    Params
+	Latency      []Metric
+	ErrorRate    []Metric
+	ResponseSize []Metric
+	Params       Params
 }
 
 type Metric string

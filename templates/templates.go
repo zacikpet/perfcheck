@@ -2,6 +2,7 @@ package templates
 
 const DefaultTemplate = `import http from 'k6/http';
 import { check, group } from 'k6';
+import { Trend } from 'k6/metrics';
 import { uuidv4, randomString } from 'https://jslib.k6.io/k6-utils/1.4.0/index.js';
 import { URL } from 'https://jslib.k6.io/url/1.0.0/index.js';
 
@@ -11,6 +12,14 @@ export const options = {
       {{- $pathname := .Pathname }}
     'http_req_duration{group:::{{ $pathname }}}': [
       {{- range .Detail.Latency -}}
+        {{- if .IsK6Supported -}}
+          '{{- . -}}', 
+        {{- end -}}
+      {{- end -}}
+    ],
+
+    'response_bytes{group:::{{ $pathname }}}': [
+      {{- range .Detail.ResponseSize -}}
         {{- if .IsK6Supported -}}
           '{{- . -}}', 
         {{- end -}}
@@ -38,6 +47,8 @@ export const options = {
   ]
   {{- end }}
 }
+
+const responseBytes = new Trend('response_bytes');
 
 const pickRandom = (array) => {
   return array[Math.floor(Math.random() * array.length)]
@@ -107,7 +118,7 @@ export default function () {
         url.searchParams.append(param, queryParams[param]);
     }
 
-    http.
+    const res = http.
     {{- if eq .Method "post" -}}
     post
     {{- else if eq .Method "put" -}}
@@ -120,6 +131,9 @@ export default function () {
     get
     {{- end -}}
     (url.href);
+
+    responseBytes.add(res.body.length);
   });
+
   {{ end }}
 }`

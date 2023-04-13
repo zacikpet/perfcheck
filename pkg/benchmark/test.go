@@ -43,10 +43,10 @@ func Test(
 		}
 	}
 
-	statOk := stat.AnalyzeData(outFile, model)
+	statOk := stat.AnalyzeData(k6DataFile, model)
 
 	if !statOk {
-		return errors.New("perfcheck/stat: service does not conform to the service-level objectives")
+		return errors.New("perfcheck/stat: SLO compliance is not statistically significant")
 	}
 
 	return nil

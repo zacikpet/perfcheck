@@ -48,6 +48,7 @@ func AnalyzeData(dataFile string, model parsers.Api) bool {
 
 	for scanner.Scan() {
 		var point DataPoint
+
 		json.Unmarshal(scanner.Bytes(), &point)
 
 		points = append(points, point)
@@ -64,10 +65,10 @@ func AnalyzeData(dataFile string, model parsers.Api) bool {
 			}
 
 			if ok {
-				allOk = false
-				fmt.Printf("%s (%s): OK\n", path.Pathname, metric)
+				fmt.Printf("%s Latency(%s): OK\n", path.Pathname, metric)
 			} else {
-				fmt.Printf("%s (%s): Failed\n", path.Pathname, metric)
+				allOk = false
+				fmt.Printf("%s Latency(%s): Failed\n", path.Pathname, metric)
 			}
 		}
 
@@ -77,10 +78,23 @@ func AnalyzeData(dataFile string, model parsers.Api) bool {
 				continue
 			}
 			if ok {
-				allOk = false
-				fmt.Printf("%s (%s): OK\n", path.Pathname, metric)
+				fmt.Printf("%s Error rate(%s): OK\n", path.Pathname, metric)
 			} else {
-				fmt.Printf("%s (%s): Failed\n", path.Pathname, metric)
+				allOk = false
+				fmt.Printf("%s Error rate(%s): Failed\n", path.Pathname, metric)
+			}
+		}
+
+		for _, metric := range path.Detail.ResponseSize {
+			isStat, ok := AnalyzeMetric(metric, points, path.Pathname, "response_bytes")
+			if !isStat {
+				continue
+			}
+			if ok {
+				fmt.Printf("%s Response size(%s): OK\n", path.Pathname, metric)
+			} else {
+				allOk = false
+				fmt.Printf("%s Response size(%s): Failed\n", path.Pathname, metric)
 			}
 		}
 	}
@@ -110,6 +124,7 @@ func AnalyzeAvgStat(points []DataPoint, name string, group string, target float6
 	var data []float64
 
 	for _, point := range points {
+
 		if point.Metric == name && point.Data.Tags.Group != nil && *point.Data.Tags.Group == group {
 			data = append(data, point.Data.Value)
 		}
