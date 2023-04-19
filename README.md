@@ -87,8 +87,9 @@ Currently supported SLI metrics are `Availability` and `Latency`.
 
 | Metric | Request-based SLI | Window-based SLI |
 | - | - | - |
-| Availability | ✅ | ❌
-| Latency | ✅ | ❌
+| Availability | ✅ | ❌ |
+| Latency | ✅ | ❌ |
+| Response size | ✅ | ❌ |
 | Custom | ❌ | ❌ |
 
 2. Set your default google credentials using the Google Cloud CLI
