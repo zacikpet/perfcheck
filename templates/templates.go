@@ -72,31 +72,38 @@ const generateFromRange = (min, max, step = 1) => {
 }
 
 const generateFromPattern = (pattern) => {
+  const uuidPattern = /string\((\d+)\)/
   const stringPattern = /string\((\d+)\)/
+  const boolPattern = /bool\(\)/
+  const rangePattern = /range\((\d+),(\d+),(\d+)\)/
 
-  if (pattern === 'uuid') {
-    return uuidv4();
+  if (uuidPattern.test(pattern)) {
+    const version = parseInt(pattern.match(uuidPattern)[1]);
+
+    if (version === 4) {
+      return uuidv4();
+    }
+
+    throw new Error('Only UUID v4 is supported');
   } else if (stringPattern.test(pattern)) {
     const length = parseInt(pattern.match(stringPattern)[1]);
 
     return randomString(length);
-  } else if (pattern === 'bool') {
+  } else if (boolPattern.test(pattern)) {
     return randomBool();
+  } else if (rangePattern.test(pattern)) {
+    const [_, min, max, step] = pattern.match(rangePattern);
+
+    return generateFromRange(parseInt(min), parseInt(max), parseInt(step));
   }
 }
 
 {{ define "params" }}
   {{- range $name, $value := . }}
-    {{- if $value.Examples }}
-      {{ $name }}: pickRandom([
-        {{- range $value.Examples -}}
-          '{{- . -}}',
-        {{- end -}}
-      ])
-    {{- else if $value.Range }}
-      {{ $name }}: generateFromRange({{ $value.Range.Min }}, {{ $value.Range.Max }}),
-    {{- else if $value.Pattern }}
+    {{- if $value.Pattern }}
       {{ $name }}: generateFromPattern('{{ $value.Pattern }}'),
+    {{- else if $value.Example }}
+      {{ $name }}: '{{ $value.Example }}',
     {{- end }}
   {{- end }}
 {{- end }}

@@ -49,9 +49,8 @@ type Params struct {
 }
 
 type ParamDescription struct {
-	Examples []any
-	Pattern  *string
-	Range    *RangeDescription
+	Example any
+	Pattern *string
 }
 
 type RangeDescription struct {
