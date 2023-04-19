@@ -36,7 +36,7 @@ changelog:
 
 snapcrafts:
   - name: perfcheck
-    publish: false
+    publish: true
     summary: Automatic SLO compliace evaluation
     description: This tool is used to evaluate the compliance of a service with service-level objectives specified in the API description of the service.
     grade: stable
