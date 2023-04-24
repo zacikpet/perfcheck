@@ -28,6 +28,22 @@ changelog:
       - '^docs:'
       - '^test:'
 
+nfpms:
+  - package_name: perfcheck
+    homepage: https://github.com/zacikpet/perfcheck
+    maintainer: Peter Žáčik
+    description: This tool is used to evaluate the compliance of a service with service-level objectives specified in the API description of the service.
+    license: MIT
+    formats:
+      - apk
+      - deb
+      - rpm
+      - termux.deb
+      - archlinux
+    recommends:
+      - k6
+    release: "1.0.0"
+
 snapcrafts:
   - name: perfcheck
     publish: true
@@ -38,3 +54,6 @@ snapcrafts:
     license: MIT
     base: core18
 
+dockers:
+  - image_templates:
+      - user/repo
