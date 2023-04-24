@@ -56,4 +56,4 @@ snapcrafts:
 
 dockers:
   - image_templates:
-      - user/repo
+      - zacikpet/perfcheck
